@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Creating NMB functions</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Creating NMB functions</h1>
+
+
+
+<div id="nmb-functions" class="section level1">
+<h1>NMB functions</h1>
+<p>The key aspect of <code>predictNMB</code> is its ability to evaluate
+simulated prediction models in terms of Net Monetary Benefit (NMB). To
+do so, it requires the user to create and provide functions that assign
+NMB values to each of the four possible classifications in a confusion
+matrix. These functions create named vectors, which are vectors of
+values that provide an NMB value for each possible outcome:</p>
+<ul>
+<li>TP: True Positives, correctly predicted events that lead to
+necessary treatment</li>
+<li>TN: True Negatives, correctly predicted non-events that avoid
+unnecessary treatment</li>
+<li>FP: False Positives, incorrectly predicted positives that lead to
+unnecessary treatment</li>
+<li>FN: False Negatives, incorrectly predicted non-events that lead to a
+lack of necessary treatment</li>
+</ul>
+<p>This vignette will guide you through creating these functions by
+hand, as well as using the helper function,
+<code>get_nmb_sampler()</code>. We start with key considerations for the
+user when creating these functions to best reflect their clinical
+context, and finish by using the created functions with
+<code>do_nmb_sim()</code>.</p>
+<div id="key-considerations" class="section level2">
+<h2>Key considerations</h2>
+<p>The functions created here are used for two purposes, depending on
+which argument they are passed to, within <code>do_nmb_sim()</code> or
+<code>screen_simulation_inputs()</code>. The arguments that require
+these functions are:</p>
+<ul>
+<li><code>fx_nmb_training</code>: only ever used if the
+<code>cost_minimising</code> or <code>value_optimising</code> cutpoint
+methods are used. These cutpoints aim to maximise the NMB, therefore
+requiring our best estimates of the NMB values assigned to each
+classification.</li>
+<li><code>fx_nmb_evaluation</code>: used for evaluation for all methods.
+This argument is required to run all simulations in
+<code>predictNMB</code>.</li>
+</ul>
+<p>The function that generates the named vector used by the
+<code>fx_nmb_evaluation</code> argument is re-evaluated at every
+iteration of the simulation. In other words, we are sampling from a
+range of plausible values for our simulation inputs. This allows us to
+incorporate uncertainty, since it is unlikely that we know these costs
+or outcomes exactly. By incorporating uncertainty this way, we are
+propagating the uncertainty throughout the whole model. This is good
+practice in simulation modelling, because our simulation will never be
+able to perfectly mirror the reality of finding the best method. If we
+include no uncertainty in <code>fx_nmb_evaluation</code>, we are making
+the assumption that we know each input of the model
+<strong>exactly</strong>.</p>
+<p>Note that we use our best estimates (without uncertainty) for the
+<code>fx_nmb_training</code> function. This reflects the fact that when
+cutpoints are selected in practice, they usually stay fixed rather than
+varying by scenario. It is this fixed value we are evaluating our
+simulations against, so we want it to be the same every time to measure
+the potential benefit of choosing another cutpoint. This may indicate
+that the merits of <code>cost_minimising</code> and
+<code>value_optimising</code> cutpoints could be overestimated, which
+will be discussed at the end when we explore
+<code>do_nmb_sim()</code>.</p>
+<p>The mean NMB per patient is evaluated at the end of each simulated
+iteration based on the inputs we have created (our named vector from
+before). For more information, see the associated vignette using
+<code>browseVignettes(package = &quot;predictNMB&quot;)</code>).</p>
+</div>
+<div id="making-functions-by-hand" class="section level2">
+<h2>Making functions by hand</h2>
+<p>This first section describes how to make the functions described
+above by hand. For users unfamiliar with R functions, this section may
+be unintuitive, and the subsequent <code>get_nmb_sampler()</code>
+section may be a gentler introduction. This section introduces all the
+flexibility that the user can express when creating these functions, but
+may be excessive for many cases.</p>
+<p>The following function applies exact estimates for each square of a
+confusion matrix:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>foo1 <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;TP&quot;</span> <span class="ot">=</span> <span class="sc">-</span><span class="dv">3</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;FP&quot;</span> <span class="ot">=</span> <span class="sc">-</span><span class="dv">1</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;TN&quot;</span> <span class="ot">=</span> <span class="dv">0</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;FN&quot;</span> <span class="ot">=</span> <span class="sc">-</span><span class="dv">4</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">foo1</span>()</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; TP FP TN FN </span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -3 -1  0 -4</span></span></code></pre></div>
+<p>Note that NMB values for each classification are equal to or less
+than zero. If we frame this around an adverse healthcare event, for
+example inpatient falls, our best case scenario is avoiding a fall
+without needing to provide any additional fall prevention care beyond
+usual patient care (<code>TN = 0</code>). The outcomes are negative
+because falls impose an additional burden. The remaining outcomes can be
+calculated if we know that the cost of a fall is $4, the cost of the
+intervention is $1, and the intervention reduces falls rate by 50%.</p>
+<p>For our possible classifications:</p>
+<ul>
+<li><span class="math inline">\(TP = -\$1 - \frac{\$4}{2} =
+-\$3\)</span> (receive the intervention ($1) and falls ($4) occur at
+half the rate (/2))</li>
+<li><span class="math inline">\(FP = -\$1\)</span> (receive the
+intervention ($1) and avoid the cost of the fall)</li>
+<li><span class="math inline">\(TN = \$0\)</span> (do not receive the
+intervention and avoid the cost of the fall)</li>
+<li><span class="math inline">\(FN -\$4\)</span> (do not have the
+intervention but experience the full cost of the fall ($4))</li>
+</ul>
+<p>Users may provide any function without arguments in this form to be
+more flexible. This allows the user to incorporate uncertainty for model
+evaluation, because we may not know our inputs exactly. For example, in
+the function below, we have sampled from distributions of values, rather
+than setting our expected value of each outcome. Every time we call the
+function, we get different values based on our chosen distributions -
+with the exception of true negative (TN) as it is fixed at zero. This
+sampling procedure is important for evaluation, and is often referred to
+in health economics as Probabilistic Sensitivity Analysis (PSA).</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>foo2 <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  intervention_cost <span class="ot">&lt;-</span> <span class="fu">rgamma</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">1</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  intervention_effectiveness <span class="ot">&lt;-</span> <span class="fu">rbeta</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape1 =</span> <span class="dv">10</span>, <span class="at">shape2 =</span> <span class="dv">10</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  fall_cost <span class="ot">&lt;-</span> <span class="fu">rgamma</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">4</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;TP&quot;</span> <span class="ot">=</span> <span class="sc">-</span>intervention_cost <span class="sc">-</span> fall_cost <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> intervention_effectiveness),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;FP&quot;</span> <span class="ot">=</span> <span class="sc">-</span>intervention_cost,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;TN&quot;</span> <span class="ot">=</span> <span class="dv">0</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;FN&quot;</span> <span class="ot">=</span> <span class="sc">-</span>fall_cost</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fu">foo2</span>()</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        TP        FP        TN        FN </span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -2.956964 -0.525874  0.000000 -4.144964</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="fu">foo2</span>()</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        TP        FP        TN        FN </span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -4.432320 -1.558675  0.000000 -6.439025</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="fu">foo2</span>()</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         TP         FP         TN         FN </span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -2.4788552 -0.7905262  0.0000000 -3.6257237</span></span></code></pre></div>
+<p>Another benefit of allowing the user to define the function structure
+is that we can also allow the low risk group, or the population whose
+risk estimates fall below the probability threshold, to receive an
+intervention rather than nothing.</p>
+<p>This can be preferable when there is more than one available
+intervention to use, and one is more costly (and presumably effective)
+than the other. For example, all patients in a hospital might have a
+medication management plan in place to reduce falls risk but the high
+risk group might also receive additional surveillance from nurses. This
+way, we can assign all high risk patients to receive the high cost and
+highly effective intervention, and all low risk patients to receive the
+low cost and less effective intervention. Extending <code>foo2()</code>
+to create the function below, we assign the low cost intervention $0.5
+and a reduction in falls of 30%.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>foo3 <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># intervention for high risk (hr) group</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  hr_intervention_cost <span class="ot">&lt;-</span> <span class="fu">rgamma</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">1</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  hr_intervention_effectiveness <span class="ot">&lt;-</span> <span class="fu">rbeta</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape1 =</span> <span class="dv">10</span>, <span class="at">shape2 =</span> <span class="dv">10</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># intervention for low risk (lr) group</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  lr_intervention_cost <span class="ot">&lt;-</span> <span class="fu">rgamma</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="fl">0.5</span> <span class="sc">*</span> <span class="dv">10</span>, <span class="at">rate =</span> <span class="dv">1</span> <span class="sc">*</span> <span class="dv">10</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  lr_intervention_effectiveness <span class="ot">&lt;-</span> <span class="fu">rbeta</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape1 =</span> <span class="dv">10</span>, <span class="at">shape2 =</span> <span class="dv">30</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  fall_cost <span class="ot">&lt;-</span> <span class="fu">rgamma</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">4</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;TP&quot;</span> <span class="ot">=</span> <span class="sc">-</span>hr_intervention_cost <span class="sc">-</span> fall_cost <span class="sc">*</span> </span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>      (<span class="dv">1</span> <span class="sc">-</span> hr_intervention_effectiveness),</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;FP&quot;</span> <span class="ot">=</span> <span class="sc">-</span>hr_intervention_cost,</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;TN&quot;</span> <span class="ot">=</span> <span class="sc">-</span>lr_intervention_cost,</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;FN&quot;</span> <span class="ot">=</span> <span class="sc">-</span>lr_intervention_cost <span class="sc">-</span> fall_cost <span class="sc">*</span> </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>      (<span class="dv">1</span> <span class="sc">-</span> lr_intervention_effectiveness)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="fu">foo3</span>()</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         TP         FP         TN         FN </span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -3.3811449 -0.9216061 -0.4612178 -3.1540229</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="fu">foo3</span>()</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         TP         FP         TN         FN </span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -2.4752515 -0.1064268 -0.2178656 -3.4447329</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="fu">foo3</span>()</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         TP         FP         TN         FN </span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -1.7163405 -0.1231965 -0.2208347 -2.4658885</span></span></code></pre></div>
+<p>Now that we are providing an intervention and associated cost to the
+low risk group, there is a negative NMB assigned to true negative (TN)
+groups. But in exchange, we have reduced the costs of false negatives
+(FNs), because at least these patients are now receiving an
+intervention, albeit a less effective one.</p>
+<p>It’s important to note that while these NMB values are negative, this
+doesn’t imply that we are worse off by implementing prediction models or
+treatments. We are simply trying to pick the least bad option. This
+becomes more apparent when we set a reference strategy, which is
+discussed in more detail in the <a href="https://docs.ropensci.org/predictNMB/articles/predictNMB.html">introductory</a>
+and <a href="https://docs.ropensci.org/predictNMB/articles/detailed-example.html">detailed
+example</a> vignettes.</p>
+</div>
+<div id="making-functions-using-get_nmb_sampler" class="section level2">
+<h2>Making functions using <code>get_nmb_sampler()</code></h2>
+<p>The previous section demonstrates how to make functions by hand and a
+general approach to thinking about intervention costs and effects. This
+same approach is used by <code>get_nmb_sampler()</code> but abstracts
+the actual creation of the function away to make things more straight
+forward for the user. It can be easier to apply for simple cases, but
+removes some of the ability to do complex modelling.</p>
+<p>To replicate what we created as <code>foo1()</code>, we pass these
+costs as separate arguments. The function is created, with the output
+<code>get_nmb_sampler()</code>. Recall:</p>
+<blockquote>
+<p>The cost of the fall is $4, the cost of the intervention is $1, and
+the intervention reduces the rate of falls by 50%.</p>
+</blockquote>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(predictNMB)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>foo1_remake <span class="ot">&lt;-</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_nmb_sampler</span>(</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome_cost =</span> <span class="dv">4</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">high_risk_group_treatment_cost =</span> <span class="dv">1</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">high_risk_group_treatment_effect =</span> <span class="fl">0.5</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">foo1_remake</span>()</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; TP FP TN FN </span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -3 -1  0 -4</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="fu">foo1</span>()</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; TP FP TN FN </span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -3 -1  0 -4</span></span></code></pre></div>
+<p>The arguments are passed as costs (<code>outcome_cost</code> and
+<code>high_risk_group_treatment_cost</code>) and the treatment effect.
+<code>high_risk_group_treatment_effect</code> is the rate reduction of
+the event for those receiving the treatment, which in our case is a 50%
+reduction (0.5).</p>
+<p>First, we write some code for making plots of sampled NMB values from
+a given function:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>plot_nmb_dist <span class="ot">&lt;-</span> <span class="cf">function</span>(f, <span class="at">n =</span> <span class="dv">10000</span>) {</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">&quot;rbind&quot;</span>, <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span>n, <span class="cf">function</span>(x) <span class="fu">f</span>()))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  data_long <span class="ot">&lt;-</span> <span class="fu">pivot_longer</span>(</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.data.frame</span>(data),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">everything</span>(),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">&quot;classification&quot;</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">&quot;NMB&quot;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(data_long, <span class="fu">aes</span>(NMB)) <span class="sc">+</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>() <span class="sc">+</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>classification) <span class="sc">+</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Net Monetary Benefit ($)&quot;</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Now we can incorporate uncertainty by passing argument-less, or blank
+functions (<code>function()</code>), followed by a sampler
+(e.g. <code>rgamma</code>), which generate sampled values as the
+arguments. When calling <code>get_nmb_sampler()</code>, we specify the
+values as the blank functions, which are evaluated every time the
+returned function is called. These let us see the uncertainty of each
+classification graphically.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>foo2_remake <span class="ot">&lt;-</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_nmb_sampler</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># our blank function, followed by a sampler</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome_cost =</span> <span class="cf">function</span>() <span class="fu">rgamma</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">4</span>), </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">high_risk_group_treatment_cost =</span> <span class="cf">function</span>() <span class="fu">rgamma</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">1</span>),</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">high_risk_group_treatment_effect =</span> <span class="cf">function</span>() <span class="fu">rbeta</span>(<span class="at">n =</span> <span class="dv">1</span>, </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                                                        <span class="at">shape1 =</span> <span class="dv">10</span>, </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                                                        <span class="at">shape2 =</span> <span class="dv">10</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_nmb_dist</span>(foo2_remake) <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">&quot;foo2_remake()&quot;</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_nmb_dist</span>(foo2) <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">&quot;foo2()&quot;</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><img src="data:image/png;base64,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" /></p>
+<p>We can also create an NMB function which replicates our prior
+scenario where the low-risk group is given a cheaper and less effective
+intervention.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>foo3_remake <span class="ot">&lt;-</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_nmb_sampler</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome_cost =</span> <span class="cf">function</span>() <span class="fu">rgamma</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">4</span>),</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">high_risk_group_treatment_cost =</span> <span class="cf">function</span>() <span class="fu">rgamma</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">1</span>),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">high_risk_group_treatment_effect =</span> <span class="cf">function</span>() <span class="fu">rbeta</span>(<span class="at">n =</span> <span class="dv">1</span>, </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                                                        <span class="at">shape1 =</span> <span class="dv">10</span>, </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                                                        <span class="at">shape2 =</span> <span class="dv">10</span>),</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">low_risk_group_treatment_cost =</span> <span class="cf">function</span>() <span class="fu">rgamma</span>(<span class="at">n =</span> <span class="dv">1</span>, </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                                                      <span class="at">shape =</span> <span class="fl">0.5</span> <span class="sc">*</span> <span class="dv">10</span>, </span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>                                                      <span class="at">rate =</span> <span class="dv">1</span> <span class="sc">*</span> <span class="dv">10</span>),</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">low_risk_group_treatment_effect =</span> <span class="cf">function</span>() <span class="fu">rbeta</span>(<span class="at">n =</span> <span class="dv">1</span>, </span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                                                       <span class="at">shape1 =</span> <span class="dv">10</span>, </span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>                                                       <span class="at">shape2 =</span> <span class="dv">30</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_nmb_dist</span>(foo3_remake) <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">&quot;foo3_remake()&quot;</span>)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_nmb_dist</span>(foo3) <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">&quot;foo3()&quot;</span>)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><img src="data:image/png;base64,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" /></p>
+<p>In addition to specifying the cost of the outcome, we can also
+incorporate health-related quality of life in the form of
+quality-adjusted life years (QALYs), and our willingness to pay (WTP)
+for these QALYs. These are included as inputs to
+<code>get_nmb_sampler()</code> to evaluate the overall net monetary
+benefit using:</p>
+<ul>
+<li><code>outcome_cost</code>: single value associated with the
+event</li>
+<li><code>wtp</code>: willingness to pay. <code>wtp</code> is multiplied
+by the <code>qalys_lost</code> input to evaluate NMB associated with the
+the event.</li>
+<li><code>qalys_lost</code>: quality-adjusted life-years lost due to the
+event. <code>qalys_lost</code> is multiplied by the <code>wtp</code>
+input to evaluate NMB associated with the event.</li>
+</ul>
+<p>You must provide EITHER the <code>outcome_cost</code> alone OR the
+<code>wtp</code> AND <code>qalys_lost</code>. You can also provide all
+three if, for example, there are some fixed costs associated with the
+event separate to the QALYs lost. For example, following a fall, every
+patient may have an X-ray, and this would be a separate cost to the
+QALYs lost and our willingness to pay for those QALYs due to the
+fall.</p>
+<p>Returning to our falls function, if our WTP is $8 and each fall is
+associated with a 0.5 QALY lost (on average), then this would be
+equivalent to our fixed cost of $4. By having these included in the
+function as separate arguments, we can more clearly represent each input
+to the model and provide more realistic representations. We can use this
+to generate estimates (and uncertainty) for the QALYs lost due to the
+event we are evaluating and our WTP to avoid the event.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>foo4 <span class="ot">&lt;-</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_nmb_sampler</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">wtp =</span> <span class="dv">8</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">qalys_lost =</span> <span class="fl">0.5</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">high_risk_group_treatment_cost =</span> <span class="dv">1</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">high_risk_group_treatment_effect =</span> <span class="fl">0.5</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">foo4</span>()</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; TP FP TN FN </span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -3 -1  0 -4</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="fu">foo1</span>()</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; TP FP TN FN </span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -3 -1  0 -4</span></span></code></pre></div>
+</div>
+<div id="passing-these-functions-to-do_nmb_sim" class="section level2">
+<h2>Passing these functions to <code>do_nmb_sim()</code></h2>
+<p>The NMB functions are passed to the <code>do_nmb_sim()</code>
+function via the <code>fx_nmb_training</code> and
+<code>fx_nmb_evaluation</code> arguments. The former is purely for
+selecting a cutpoint if you’re using either the
+<code>&#39;cost_minimising&#39;</code> or <code>&#39;value_optimising&#39;</code>
+cutpoint methods. Here, we will use the <code>&#39;value_optimising&#39;</code>
+cutpoint method alongside the Youden index and a treat all/none
+strategy.</p>
+<p>In this first example, we pass <code>foo1</code> to the
+<code>do_nmb_sim()</code> function, which is our function that always
+provides the same values for every simulation, as if we
+<strong>know</strong> the exact outcome of each possible prediction. As
+mentioned before, see the other vignettes for more information on the
+inputs for the <code>do_nmb_sim()</code> function.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>simulation_res1 <span class="ot">&lt;-</span> <span class="fu">do_nmb_sim</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_size =</span> <span class="dv">200</span>, <span class="at">n_sims =</span> <span class="dv">500</span>, <span class="at">n_valid =</span> <span class="dv">10000</span>, <span class="at">sim_auc =</span> <span class="fl">0.7</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">event_rate =</span> <span class="fl">0.1</span>, <span class="at">fx_nmb_training =</span> foo1, <span class="at">fx_nmb_evaluation =</span> foo1,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cutpoint_methods =</span> <span class="fu">c</span>(<span class="st">&quot;all&quot;</span>, <span class="st">&quot;none&quot;</span>, <span class="st">&quot;youden&quot;</span>, <span class="st">&quot;value_optimising&quot;</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(simulation_res1) <span class="sc">+</span> <span class="fu">theme_sim</span>()</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>As mentioned previously, the problem with using <code>foo1</code> for
+<code>fx_nmb_evaluation</code> is that we don’t really know for sure how
+effective our intervention is, what the burden of the event is, and how
+much things cost. This is why we incorporate uncertainty into the
+evaluation function, but ONLY the evaluation function and not the
+training function. If we use an NMB function that incorporates
+uncertainty for selecting the cutpoint in <code>fx_nmb_training</code>,
+this would mean we picked costs randomly and used those on our data to
+select a cutpoint. This would be unlikely in practice, as we would use
+our expected value (best estimates) to determine cutpoints in
+reality.</p>
+<p><code>get_nmb_sampler()</code> also offers the ability to extract
+these fixed (expected) values by sampling from the distributions and
+using the column means for <code>fx_nmb_training</code>.</p>
+<p>For example, using <code>foo2_remake()</code>, we use
+<code>get_nmb_sampler()</code> in the same way but include
+<code>use_expected_values = TRUE</code> so that it returns a function
+that gives fixed values for training:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>foo2_remake <span class="ot">&lt;-</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_nmb_sampler</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome_cost =</span> <span class="cf">function</span>() <span class="fu">rgamma</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">4</span>),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">high_risk_group_treatment_cost =</span> <span class="cf">function</span>() <span class="fu">rgamma</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">1</span>),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">high_risk_group_treatment_effect =</span> <span class="cf">function</span>() <span class="fu">rbeta</span>(<span class="at">n =</span> <span class="dv">1</span>, </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                                                        <span class="at">shape1 =</span> <span class="dv">10</span>, </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                                                        <span class="at">shape2 =</span> <span class="dv">10</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>foo2_remake_training <span class="ot">&lt;-</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_nmb_sampler</span>(</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome_cost =</span> <span class="cf">function</span>() <span class="fu">rgamma</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">4</span>),</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">high_risk_group_treatment_cost =</span> <span class="cf">function</span>() <span class="fu">rgamma</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">1</span>),</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">high_risk_group_treatment_effect =</span> <span class="cf">function</span>() <span class="fu">rbeta</span>(<span class="at">n =</span> <span class="dv">1</span>,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>                                                        <span class="at">shape1 =</span> <span class="dv">10</span>, </span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>                                                        <span class="at">shape2 =</span> <span class="dv">10</span>),</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">use_expected_values =</span> <span class="cn">TRUE</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="fu">foo2_remake_training</span>()</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         TP         FP         TN         FN </span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -2.9959312 -0.9895939  0.0000000 -4.0109703</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="fu">foo2_remake_training</span>()</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         TP         FP         TN         FN </span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -2.9959312 -0.9895939  0.0000000 -4.0109703</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="fu">foo2_remake_training</span>()</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         TP         FP         TN         FN </span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -2.9959312 -0.9895939  0.0000000 -4.0109703</span></span></code></pre></div>
+<p>In many cases (including this one), this will give similar values to
+using the parameter estimates (i.e. <code>foo1()</code>), but not
+always. The values from this process should be more stable than using
+the estimates.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>simulation_res2 <span class="ot">&lt;-</span> <span class="fu">do_nmb_sim</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_size =</span> <span class="dv">200</span>, <span class="at">n_sims =</span> <span class="dv">500</span>, <span class="at">n_valid =</span> <span class="dv">10000</span>, <span class="at">sim_auc =</span> <span class="fl">0.7</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">event_rate =</span> <span class="fl">0.1</span>, <span class="at">fx_nmb_training =</span> foo2_remake_training, </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">fx_nmb_evaluation =</span> foo2_remake,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cutpoint_methods =</span> <span class="fu">c</span>(<span class="st">&quot;all&quot;</span>, <span class="st">&quot;none&quot;</span>, <span class="st">&quot;youden&quot;</span>, <span class="st">&quot;value_optimising&quot;</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(simulation_res2) <span class="sc">+</span> <span class="fu">theme_sim</span>()</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>This changes our results to incorporate more uncertainty. This is
+important in simulation modelling as it accounts for the possible
+differences between our simulation and reality. Using values from the
+literature would likely reduce the uncertainty somewhat, but that might
+only be desirable if we are confident that our simulated model closely
+resembles the scenario in the literature.</p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
