@@ -14,31 +14,26 @@ library(flextable)
 set.seed(42)
 
 ## -----------------------------------------------------------------------------
-get_nmb_sampler_training <- function() {
-  c(
-    "TP" = rnorm(n = 1, mean = -80, sd = 5),
-    "TN" = 0,
-    "FP" = -20,
-    "FN" = rnorm(n = 1, mean = -100, sd = 10)
-  )
-}
+get_nmb_sampler_training <- get_nmb_sampler(
+  wtp = 28033,
+  qalys_lost = function() rnorm(n = 1, mean = 0.0036, sd = 0.0005),
+  high_risk_group_treatment_cost = function() rnorm(n = 1, mean = 20, sd = 3),
+  high_risk_group_treatment_effect = function() rbeta(n = 1, shape1 = 40, shape2 = 60),
+  use_expected_values = TRUE
+)
 
-get_nmb_sampler_evaluation <- function() {
-  c(
-    "TP" = -80,
-    "TN" = 0,
-    "FP" = -20,
-    "FN" = -100
-  )
-}
-
-## ---- eval=FALSE--------------------------------------------------------------
-#  cl <- makeCluster(2)
+get_nmb_sampler_evaluation <- get_nmb_sampler(
+  wtp = 28033,
+  qalys_lost = function() rnorm(n = 1, mean = 0.0036, sd = 0.0005),
+  high_risk_group_treatment_cost = function() rnorm(n = 1, mean = 20, sd = 3),
+  high_risk_group_treatment_effect = function() rbeta(n = 1, shape1 = 40, shape2 = 60)
+)
 
 ## ---- echo=FALSE--------------------------------------------------------------
 sim_screen_obj <- readRDS("fixtures/predictNMB-sim_screen_obj.rds")
 
 ## ---- eval=FALSE--------------------------------------------------------------
+#  cl <- makeCluster(2)
 #  sim_screen_obj <- screen_simulation_inputs(
 #    n_sims = 500,
 #    n_valid = 10000,
@@ -161,6 +156,18 @@ autoplot(
   label_wrap_width = 5,
   conf.level = 0.8
 ) + theme_sim()
+
+## -----------------------------------------------------------------------------
+ce_plot(do_nmb_sim_obj, ref_col = "none")
+
+## -----------------------------------------------------------------------------
+attr(do_nmb_sim_obj$meta_data$fx_nmb_evaluation, "wtp")
+
+## -----------------------------------------------------------------------------
+ce_plot(do_nmb_sim_obj, ref_col = "none", wtp = 100000)
+
+## -----------------------------------------------------------------------------
+ce_plot(do_nmb_sim_obj, ref_col = "none", show_wtp = FALSE)
 
 ## ---- eval=FALSE--------------------------------------------------------------
 #  summary(sim_screen_obj)

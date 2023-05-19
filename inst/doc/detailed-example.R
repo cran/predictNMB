@@ -11,27 +11,14 @@ library(predictNMB)
 library(parallel)
 
 ## -----------------------------------------------------------------------------
+fx_nmb <- get_nmb_sampler(
+  outcome_cost = 9324,
+  wtp = 28033,
+  qalys_lost = 0.23,
+  high_risk_group_treatment_effect = 0.58,
+  high_risk_group_treatment_cost = 161
+)
 
-fx_nmb <- function() {
-  cost_of_pi <- 9324
-  eff_pup <- 0.58
-  cost_pup <- 161
-  c(
-    # True positive = Correctly predicted event savings - intervention cost
-    "TP" = -cost_of_pi * eff_pup - cost_pup, 
-    
-    # False positive: Cost of (unnecessary) treatment from incorrectly 
-    # predicted positive
-    "FP" = -cost_pup, 
-    
-    # True negative: No cost of treatment or event from correctly 
-    # predicted negative
-    "TN" = 0, 
-    
-    # False negative: Full cost of event from incorrectly predicted negative
-    "FN" = -cost_of_pi 
-  )
-}
 
 fx_nmb()
 
@@ -62,6 +49,9 @@ nmb_simulation <- readRDS("fixtures/detailed_example-nmb_simulation.rds")
 #    fx_nmb_evaluation = fx_nmb
 #  )
 
+## ---- echo=FALSE, eval=FALSE--------------------------------------------------
+#  saveRDS(nmb_simulation, "fixtures/detailed_example-nmb_simulation.rds")
+
 ## -----------------------------------------------------------------------------
 nmb_simulation
 
@@ -77,17 +67,15 @@ autoplot(nmb_simulation, what = "cutpoints") + theme_sim()
 autoplot(nmb_simulation, what = "inb", inb_ref_col = "all") + theme_sim()
 
 ## -----------------------------------------------------------------------------
-fx_nmb_sampler <- function() {
-  cost_of_pi <- rnorm(n = 1, mean = 9234, sd = 814)
-  eff_pup <- exp(rnorm(n = 1, mean = log(0.58), sd = 0.43))
-  cost_pup <- rnorm(n = 1, mean = 161, sd = 49)
-  c(
-    "TP" = -cost_of_pi * eff_pup - cost_pup,
-    "FP" = -cost_pup,
-    "TN" = 0,
-    "FN" = -cost_of_pi
-  )
-}
+
+fx_nmb_sampler <- get_nmb_sampler(
+  outcome_cost = function() rnorm(n = 1, mean = 9324, sd = 814),
+  wtp = 28033,
+  qalys_lost = function() (rbeta(n = 1, shape1 = 25.41, shape2 = 4.52) - rbeta(n = 1, shape1 = 67.34, shape2 = 45.14)),
+  high_risk_group_treatment_effect = function() exp(rnorm(n = 1, mean = log(0.58), sd = 0.43)),
+  high_risk_group_treatment_cost = function() rnorm(n = 1, mean = 161, sd = 49)
+)
+
 
 fx_nmb_sampler()
 fx_nmb_sampler()

@@ -140,6 +140,49 @@ foo4 <-
 foo4()
 foo1()
 
+## -----------------------------------------------------------------------------
+foo4 <-
+  get_nmb_sampler(
+    wtp = 8,
+    qalys_lost = 0.5,
+    high_risk_group_treatment_cost = 1,
+    high_risk_group_treatment_effect = 0.5
+  )
+
+foo4()
+class(foo4)
+class(foo1)
+attributes(foo4)
+
+## ---- eval=FALSE--------------------------------------------------------------
+#  simulation_foo4 <- do_nmb_sim(
+#    sample_size = 200, n_sims = 500, n_valid = 10000, sim_auc = 0.7,
+#    event_rate = 0.1, fx_nmb_training = foo1, fx_nmb_evaluation = foo4,
+#    cutpoint_methods = c("all", "none", "youden", "value_optimising")
+#  )
+#  
+#  simulation_foo1 <- do_nmb_sim(
+#    sample_size = 200, n_sims = 500, n_valid = 10000, sim_auc = 0.7,
+#    event_rate = 0.1, fx_nmb_training = foo1, fx_nmb_evaluation = foo1,
+#    cutpoint_methods = c("all", "none", "youden", "value_optimising")
+#  )
+
+## ---- echo=FALSE--------------------------------------------------------------
+simulation_foo4 <- readRDS("fixtures/nmb-functions-simulation_foo4.rds")
+simulation_foo1 <- readRDS("fixtures/nmb-functions-simulation_res1.rds")
+
+## ---- eval=FALSE, echo=FALSE--------------------------------------------------
+#  saveRDS(simulation_foo4, "fixtures/nmb-functions-simulation_foo4.rds")
+#  saveRDS(simulation_foo1, "fixtures/nmb-functions-simulation_res1.rds")
+
+## -----------------------------------------------------------------------------
+names(simulation_foo4)
+names(simulation_foo1)
+
+## ---- error=TRUE--------------------------------------------------------------
+ce_plot(simulation_foo4, ref_col = "all")
+ce_plot(simulation_foo1, ref_col = "all")
+
 ## ---- echo=FALSE--------------------------------------------------------------
 simulation_res1 <- readRDS("fixtures/nmb-functions-simulation_res1.rds")
 

@@ -12,29 +12,27 @@ library(parallel)
 set.seed(42)
 
 ## -----------------------------------------------------------------------------
-get_nmb_sampler <- function() {
-  c(
-    "TP" = rnorm(n = 1, mean = -80, sd = 5),
-    "TN" = 0,
-    "FP" = -20,
-    "FN" = rnorm(n = 1, mean = -100, sd = 10)
-  )
-}
+nmb_sampler <- get_nmb_sampler(
+  wtp = 28033,
+  qalys_lost = function() rnorm(n = 1, mean = 0.0036, sd = 0.0005),
+  high_risk_group_treatment_cost = function() rnorm(n = 1, mean = 20, sd = 3),
+  high_risk_group_treatment_effect = function() rbeta(n = 1, shape1 = 40, shape2 = 60)
+)
 
-get_nmb_sampler()
-get_nmb_sampler()
-get_nmb_sampler()
+rbind(nmb_sampler(), nmb_sampler(), nmb_sampler())
+
+
 
 ## -----------------------------------------------------------------------------
-get_nmb_sampler_training <- function() {
-  c(
-    "TP" = -80,
-    "TN" = 0,
-    "FP" = -20,
-    "FN" = -100
-  )
-}
-get_nmb_sampler_training()
+nmb_sampler_training <- get_nmb_sampler(
+  wtp = 28033,
+  qalys_lost = function() rnorm(n = 1, mean = 0.0036, sd = 0.0007),
+  high_risk_group_treatment_cost = rnorm(n = 1, mean = 20, sd = 5),
+  high_risk_group_treatment_effect = function() rbeta(n = 1, shape1 = 40, shape2 = 60),
+  use_expected_values = TRUE
+)
+rbind(nmb_sampler_training(), nmb_sampler_training(), nmb_sampler_training())
+
 
 ## ---- echo=FALSE--------------------------------------------------------------
 nmb_simulation <- readRDS("fixtures/predictNMB-nmb_simulation.rds")
@@ -46,8 +44,8 @@ nmb_simulation <- readRDS("fixtures/predictNMB-nmb_simulation.rds")
 #    n_valid = 10000,
 #    sim_auc = 0.7,
 #    event_rate = 0.1,
-#    fx_nmb_training = get_nmb_sampler_training,
-#    fx_nmb_evaluation = get_nmb_sampler,
+#    fx_nmb_training = nmb_sampler_training,
+#    fx_nmb_evaluation = nmb_sampler,
 #    show_progress = TRUE
 #  )
 
@@ -69,7 +67,7 @@ autoplot(nmb_simulation) + theme_sim()
 ## -----------------------------------------------------------------------------
 get_inbuilt_cutpoint_methods()
 
-autoplot(nmb_simulation, methods = c("all", "none", "youden")) + theme_sim()
+autoplot(nmb_simulation, methods_order = c("all", "none", "youden")) + theme_sim()
 
 ## -----------------------------------------------------------------------------
 autoplot(nmb_simulation, what = "cutpoints") + theme_sim()
@@ -83,20 +81,21 @@ head(nmb_simulation$df_result)
 ## -----------------------------------------------------------------------------
 head(nmb_simulation$df_thresholds)
 
-## ---- eval=FALSE--------------------------------------------------------------
-#  cl <- makeCluster(2)
+## -----------------------------------------------------------------------------
+ce_plot(nmb_simulation, ref_col = "all", methods_order = c("all", "none", "youden"))
 
 ## ---- echo=FALSE--------------------------------------------------------------
 sim_screen_obj <- readRDS("fixtures/predictNMB-sim_screen_obj.rds")
 
 ## ---- eval=FALSE--------------------------------------------------------------
+#  cl <- makeCluster(2)
 #  sim_screen_obj <- screen_simulation_inputs(
 #    n_sims = 500,
 #    n_valid = 10000,
 #    sim_auc = seq(0.7, 0.95, 0.05),
 #    event_rate = c(0.1, 0.2),
-#    fx_nmb_training = get_nmb_sampler_training,
-#    fx_nmb_evaluation = get_nmb_sampler,
+#    fx_nmb_training = nmb_sampler_training,
+#    fx_nmb_evaluation = nmb_sampler,
 #    cutpoint_methods = c("all", "none", "youden", "value_optimising"),
 #    cl = cl
 #  )

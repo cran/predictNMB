@@ -101,7 +101,12 @@ get_inbuilt_cutpoint <- function(predicted,
   inbuilt_methods <- get_inbuilt_cutpoint_methods()
 
   if (length(unique(actual)) != 2) {
-    stop(paste0("data were all ", unique(actual), "'s"))
+    stop(
+      paste0(
+        "data should contain only two levels but had: ",
+        paste0(unique(actual), collapse = ",")
+      )
+    )
   }
 
   if (!method %in% inbuilt_methods) {
@@ -209,7 +214,7 @@ get_inbuilt_cutpoint <- function(predicted,
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
 #' # get thresholds using default (all inbuilt) cutpoint methods
 #' get_thresholds(
 #'   predicted = runif(1000),
@@ -259,6 +264,7 @@ get_inbuilt_cutpoint <- function(predicted,
 #'   ),
 #'   nmb = c("TP" = -3, "TN" = 0, "FP" = -1, "FN" = -4)
 #' )
+#' }
 get_thresholds <- function(predicted, actual, nmb, cutpoint_methods = NULL) {
   inbuilt_methods <- get_inbuilt_cutpoint_methods()
   if (is.null(cutpoint_methods)) {
