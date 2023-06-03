@@ -2,7 +2,7 @@ utils::globalVariables(
   c(
     "name", "value", "percentile", "n_sim", "m", "outcome", "count",
     "in_interval", "ymin", "ymax", "method", "small_grid_id", "fx_nmb_both",
-    "qalys", "costs"
+    "qalys", "costs", "ce"
   )
 )
 
@@ -223,4 +223,29 @@ approx_match <- function(vec, val) {
   # matching values to those vectors.
   # all.equal() performs a test for 'near equality' so doesn't have this issue.
   unlist(lapply(vec, function(x) isTRUE(all.equal(x, val))))
+}
+
+
+#' Get axis label for autoplot()'s
+#'
+#' @param var Variable being plotted needing title.
+#'
+#' @return Returns an axis title appropriate for variable.
+#'
+#' @noRd
+get_axis_label <- function(var) {
+  switch(var,
+    "nmb" = "Net Monetary Benefit ($)",
+    "inb" = "Incremental Net Monetary Benefit ($)",
+    "cutpoints" = "Selected Cutpoint",
+    "qalys" = "Quality-Adjusted Life Years (QALYs)",
+    "costs" = "Costs ($)",
+    "sample_size" = "Training sample size (n)",
+    "n_sims" = "Number of simulations (n)",
+    "n_valid" = "Validation sample size (n)",
+    "sim_auc" = "Model AUC",
+    "event_rate" = "Event rate",
+    "fx_nmb_training" = "NMB Sampling Function (training)",
+    "fx_nmb_evaluation" = "NMB Sampling Function (evaluation)"
+  )
 }

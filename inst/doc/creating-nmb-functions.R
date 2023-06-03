@@ -37,11 +37,11 @@ foo2()
 
 ## -----------------------------------------------------------------------------
 foo3 <- function() {
-  # intervention for high risk (hr) group
+  # intervention for high-risk (hr) group
   hr_intervention_cost <- rgamma(n = 1, shape = 1)
   hr_intervention_effectiveness <- rbeta(n = 1, shape1 = 10, shape2 = 10)
 
-  # intervention for low risk (lr) group
+  # intervention for low-risk (lr) group
   lr_intervention_cost <- rgamma(n = 1, shape = 0.5 * 10, rate = 1 * 10)
   lr_intervention_effectiveness <- rbeta(n = 1, shape1 = 10, shape2 = 30)
 

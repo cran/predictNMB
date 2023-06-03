@@ -1,7 +1,7 @@
 Package: predictNMB
 Type: Package
 Title: Evaluate Clinical Prediction Models by Net Monetary Benefit
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: c(
     person(given = "Rex", 
            family = "Parsons", 
@@ -43,7 +43,7 @@ License: GPL (>= 3)
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 Imports: assertthat, cutpointr, dplyr, ggplot2, magrittr, pmsampsize,
-        rlang, stats, tibble, tidyr
+        rlang, scales, stats, tibble, tidyr
 Suggests: spelling, covr, flextable, knitr, parallel, pbapply,
         rmarkdown, testthat (>= 3.0.0), vdiffr, withr
 Config/testthat/edition: 3
@@ -53,7 +53,7 @@ BugReports: https://github.com/ropensci/predictNMB/issues
 Depends: R (>= 3.5.0)
 Language: en-US
 NeedsCompilation: no
-Packaged: 2023-05-19 05:05:45 UTC; n10891277
+Packaged: 2023-06-03 07:19:02 UTC; n10891277
 Author: Rex Parsons [aut, cre] (<https://orcid.org/0000-0002-6053-8174>),
   Robin Blythe [aut] (<https://orcid.org/0000-0002-3643-4332>),
   Adrian Barnett [aut] (<https://orcid.org/0000-0001-6339-0374>),
@@ -66,4 +66,4 @@ Author: Rex Parsons [aut, cre] (<https://orcid.org/0000-0002-6053-8174>),
   Steven McPhail [ctb] (<https://orcid.org/0000-0002-1463-662X>)
 Maintainer: Rex Parsons <rex.parsons94@gmail.com>
 Repository: CRAN
-Date/Publication: 2023-05-19 05:30:02 UTC
+Date/Publication: 2023-06-03 07:40:02 UTC

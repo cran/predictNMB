@@ -69,11 +69,9 @@ autoplot(sim_screen_obj, plot_conf_level = FALSE, plot_range = FALSE)
 autoplot(sim_screen_obj, plot_conf_level = FALSE, plot_range = FALSE, plot_line = FALSE)
 
 ## ---- message=FALSE-----------------------------------------------------------
-autoplot(sim_screen_obj)
 autoplot(sim_screen_obj, dodge_width = 0.01)
 
 ## ---- message=FALSE-----------------------------------------------------------
-autoplot(sim_screen_obj)
 autoplot(
   sim_screen_obj,
   rename_vector = c("Treat All" = "all", 
@@ -83,7 +81,6 @@ autoplot(
 )
 
 ## ---- message=FALSE-----------------------------------------------------------
-autoplot(sim_screen_obj)
 autoplot(sim_screen_obj, methods_order = c("all", "none"))
 autoplot(
   sim_screen_obj,
@@ -95,7 +92,6 @@ autoplot(
 )
 
 ## ---- message=FALSE-----------------------------------------------------------
-autoplot(sim_screen_obj)
 autoplot(sim_screen_obj, plot_alpha = 0.2)
 autoplot(sim_screen_obj, plot_alpha = 1)
 
@@ -168,6 +164,16 @@ ce_plot(do_nmb_sim_obj, ref_col = "none", wtp = 100000)
 
 ## -----------------------------------------------------------------------------
 ce_plot(do_nmb_sim_obj, ref_col = "none", show_wtp = FALSE)
+
+## -----------------------------------------------------------------------------
+ce_plot(do_nmb_sim_obj, ref_col = "none", shape = 15, add_prop_ce = TRUE)
+ce_plot(do_nmb_sim_obj, ref_col = "none", shape = "square", add_prop_ce = TRUE)
+ce_plot(do_nmb_sim_obj, ref_col = "none", shape = "cost-effective", wtp = 80000, add_prop_ce = TRUE)
+ce_plot(do_nmb_sim_obj, ref_col = "none", shape = "method", add_prop_ce = TRUE)
+
+## -----------------------------------------------------------------------------
+ce_plot(do_nmb_sim_obj, ref_col = "none", shape = "method") + 
+  ggplot2::scale_color_manual(values = rep("black", 3))
 
 ## ---- eval=FALSE--------------------------------------------------------------
 #  summary(sim_screen_obj)
